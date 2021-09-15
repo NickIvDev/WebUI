@@ -1,0 +1,103 @@
+﻿@model WebUI.ViewModels.PathViewModel
+@{
+    ViewData["Title"] = "Каталог";
+}
+
+@section Header
+{
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark font-weight-bold" asp-action="GetPcDisk">Мой компьютер</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark font-weight-bold" href="javascript:history.back()">Назад</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav> 
+}
+
+<h4>Дирректория: @Model.Path</h4>
+<h4>Папки дирректории: @Model.Catalogs.Count()</h4>
+<h4>Фалы дирректории: @Model.Files.Count()</h4>
+<br />
+
+<table class="table">
+    <tr>
+        <td>                        
+            <div class="form-inline">
+                <form method="post" asp-route-path="@Model.Path">
+                    <b>Имя:</b>
+                    &ensp;
+                    <input name="formData" class="form-control" />
+                    &ensp;
+                    <input type="submit" value="Поиск" />
+                    &ensp;
+                </form>
+                <form method="post" asp-route-path="@Model.Path" asp-route-formData="">                    
+                    <input type="submit" value="Показать всех" />
+                </form>
+            </div>                          
+        </td>
+        <td>
+            <form method="post">
+                <div class="form-inline">
+                    <b>Размер:</b>
+                    &ensp;
+                    <input asp-route-path="@Model.Path" asp-route-filter="ascending" type="submit" value="По возрастанию" />
+                    &ensp;
+                    <input asp-route-path="@Model.Path" asp-route-filter="descending" type="submit" value="По убыванию" />
+                    &ensp;
+                    <input asp-route-path="@Model.Path" asp-route-filter="noAccessToFile" type="submit" value="Файл без доступа" />
+                </div>
+            </form>
+        </td>
+    </tr>
+
+    @if (Model.Catalogs.Count() != 0)
+    {
+        @foreach (var item in Model.Catalogs)
+        {
+            <tr>
+                <td>
+                    <a style="color:black" asp-action="Path" asp-route-path="@item.PathName">
+                        <image width="60" src="@item.Image"></image>
+                        <b>@item.Name</b>
+                    </a>
+                </td>
+                @if (item.NoAccessToFile == false)
+                {
+                    <td>
+                        <b>@item.BusySpace ГБ</b>
+                    </td>
+                }
+                else 
+                {
+                    <td>
+                        <b style="color:darkorange">Нет доступа к файлу</b>
+                    </td>
+                }                   
+            </tr>
+        }
+    }
+
+    @if (Model.Files.Count() != 0)
+    {
+        @foreach (var item in Model.Files)
+        {
+            <tr>
+                <td>
+                    <image width="60" src="@item.Image"></image>
+                    <b>@item.Name</b>
+                </td>
+                <td>
+                    <b>@item.BusySpace МБ</b>
+                </td>
+            </tr>
+        }
+    }
+</table>

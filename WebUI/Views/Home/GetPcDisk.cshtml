@@ -1,0 +1,26 @@
+﻿@model List<Disk>
+@{
+    ViewData["Title"] = "Локальные диски";
+}
+
+<br />
+<br />
+<h4>Локальные диски(@Model.Count()):</h4>
+<br />
+
+@foreach (var item in Model)
+{
+    <div>        
+        <a asp-action="Path" asp-route-path="@item.NamePath" style="color:black">
+            <div class="float-left">
+                <image width="60" src="@item.Image"></image>
+            </div>
+            <div>
+                <b>Локальный диск(@item.Name)</b>
+                <br />
+                <b>@item.FreeSpace ГБ свободно из @item.Space ГБ</b>
+            </div>
+        </a>
+    </div>
+    <br />
+}
