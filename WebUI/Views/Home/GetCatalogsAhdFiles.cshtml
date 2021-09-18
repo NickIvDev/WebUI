@@ -1,4 +1,4 @@
-﻿@model WebUI.ViewModels.PathViewModel
+﻿@model WebUI.ViewModels.GetCatalogsAhdFilesViewModel
 @{
     ViewData["Title"] = "Каталог";
 }
@@ -10,7 +10,7 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark font-weight-bold" asp-action="GetPcDisk">Мой компьютер</a>
+                        <a class="nav-link text-dark font-weight-bold" asp-action="GetPcDisks">Мой компьютер</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-dark font-weight-bold" href="javascript:history.back()">Назад</a>
@@ -30,15 +30,15 @@
     <tr>
         <td>                        
             <div class="form-inline">
-                <form method="post" asp-route-path="@Model.Path">
+                <form method="post" asp-action="GetFilterDataByName" asp-route-path="@Model.Path">
                     <b>Имя:</b>
                     &ensp;
-                    <input name="formData" class="form-control" />
+                    <input name="elementName" class="form-control" />
                     &ensp;
                     <input type="submit" value="Поиск" />
                     &ensp;
                 </form>
-                <form method="post" asp-route-path="@Model.Path" asp-route-formData="">                    
+                <form method="post" asp-action="GetFilterDataByName" asp-route-path="@Model.Path">                    
                     <input type="submit" value="Показать всех" />
                 </form>
             </div>                          
@@ -48,11 +48,11 @@
                 <div class="form-inline">
                     <b>Размер:</b>
                     &ensp;
-                    <input asp-route-path="@Model.Path" asp-route-filter="ascending" type="submit" value="По возрастанию" />
+                    <input asp-action="GetFilterDataBySize" asp-route-path="@Model.Path" asp-route-filterBySize="ascending" type="submit" value="По возрастанию" />
                     &ensp;
-                    <input asp-route-path="@Model.Path" asp-route-filter="descending" type="submit" value="По убыванию" />
+                    <input asp-action="GetFilterDataBySize" asp-route-path="@Model.Path" asp-route-filterBySize="descending" type="submit" value="По убыванию" />
                     &ensp;
-                    <input asp-route-path="@Model.Path" asp-route-filter="noAccessToFile" type="submit" value="Файл без доступа" />
+                    <input asp-action="GetFilterDataBySize" asp-route-path="@Model.Path" asp-route-filterBySize="noAccessToFile" type="submit" value="Файл без доступа" />
                 </div>
             </form>
         </td>
@@ -64,7 +64,7 @@
         {
             <tr>
                 <td>
-                    <a style="color:black" asp-action="Path" asp-route-path="@item.PathName">
+                    <a style="color:black" asp-action="TransitionToCatalog" asp-route-path="@item.PathName">
                         <image width="60" src="@item.Image"></image>
                         <b>@item.Name</b>
                     </a>

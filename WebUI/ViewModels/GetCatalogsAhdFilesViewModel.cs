@@ -6,7 +6,7 @@ using WebUI.Models;
 
 namespace WebUI.ViewModels
 {
-    public class PathViewModel
+    public class GetCatalogsAhdFilesViewModel
     {
         public string Path { get; set; }
         public List<CatalogModel> Catalogs { get; set; }
