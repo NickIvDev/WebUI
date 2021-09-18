@@ -3,6 +3,7 @@
     ViewData["Title"] = "Локальные диски";
 }
 
+<h4>Test</h4>
 <br />
 <br />
 <h4>Локальные диски(@Model.Count()):</h4>
@@ -10,7 +11,7 @@
 
 @foreach (var item in Model)
 {
-    <div>        
+    <div>
         <a asp-action="Path" asp-route-path="@item.NamePath" style="color:black">
             <div class="float-left">
                 <image width="60" src="@item.Image"></image>
