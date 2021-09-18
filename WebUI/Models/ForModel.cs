@@ -16,6 +16,12 @@ namespace WebUI.Models
         // занимаемое место на диске(либо размер диска - для дисков)
         public double SizeElement { get; set; }
 
+        // размерность SizeElement(КБ,МБ,ГБ)
+        public string TypeOfSize { get; set; }
+
+        // значение SizeElement в KB(для сортировки списка)
+        public double SizeElementToKb { get; set; }
+
         // ссылка на изображение
         public string Image { get; set; }       
 

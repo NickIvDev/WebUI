@@ -109,8 +109,8 @@ namespace WebUI.Controllers
                         GetCatalogsAhdFilesViewModel m = new GetCatalogsAhdFilesViewModel
                         {
                             Path = path,
-                            Catalogs = c.OrderBy(c => c.SizeElement).ToList(),
-                            Files = f.OrderBy(f => f.SizeElement).ToList(),
+                            Catalogs = c.OrderBy(c => c.SizeElementToKb).ToList(),
+                            Files = f.OrderBy(f => f.SizeElementToKb).ToList(),
                         };
                         return View("GetCatalogsAhdFiles", m);
 
@@ -134,8 +134,8 @@ namespace WebUI.Controllers
                         GetCatalogsAhdFilesViewModel m1 = new GetCatalogsAhdFilesViewModel
                         {
                             Path = path,
-                            Catalogs = c1.OrderByDescending(c => c.SizeElement).ToList(),
-                            Files = f1.OrderByDescending(f => f.SizeElement).ToList(),
+                            Catalogs = c1.OrderByDescending(c => c.SizeElementToKb).ToList(),
+                            Files = f1.OrderByDescending(f => f.SizeElementToKb).ToList(),
                         };
                         return View("GetCatalogsAhdFiles", m1);
 
@@ -216,9 +216,7 @@ namespace WebUI.Controllers
                     sizeCatalog = SizeCatalog(item.PathName, ref sizeCatalog);
 
                     // для более точного отслеживания нуля
-                    double testSizeCatalog = sizeCatalog;
-
-                    sizeCatalog = Math.Round((double)(sizeCatalog / 1024 / 1024 / 1024), 2);
+                    double testSizeCatalog = sizeCatalog;                    
 
                     // отлавливаем каталоги без доступа(или с файлами без доступа)
                     if (testSizeCatalog == 0)
@@ -237,7 +235,25 @@ namespace WebUI.Controllers
                             item.NoAccessToFile = true;
                         }
                     }
-                    item.SizeElement = sizeCatalog;
+
+                    if (testSizeCatalog >= 1024 * 1024 * 1024)
+                    {
+                        item.TypeOfSize = "GB";
+                        item.SizeElement = Math.Round((double)(sizeCatalog / 1024 / 1024 / 1024), 2);
+                        item.SizeElementToKb = Math.Round((double)(sizeCatalog / 1024), 2);
+                    }
+                    else if (testSizeCatalog >= 1024 * 1024)
+                    {
+                        item.TypeOfSize = "MB";
+                        item.SizeElement = Math.Round((double)(sizeCatalog / 1024 / 1024), 2);
+                        item.SizeElementToKb = Math.Round((double)(sizeCatalog / 1024), 2);
+                    }
+                    else
+                    {
+                        item.TypeOfSize = "KB";
+                        item.SizeElement = Math.Round((double)(sizeCatalog / 1024), 2);
+                        item.SizeElementToKb = Math.Round((double)(sizeCatalog / 1024), 2);
+                    }
                 }
 
                 // файлы
@@ -251,13 +267,35 @@ namespace WebUI.Controllers
                     else
                         lastIndex = item.LastIndexOf('\\');
 
-                    string name = item.Substring(++lastIndex);
                     FileInfo toBusySpace = fileInfosForFiles.FirstOrDefault(f => f.FullName == item);
+                    double sizeElement = toBusySpace.Length;
+                    double sizeElementToKb = toBusySpace.Length;
+                    string typeOfSize;
+                    if (sizeElement >= 1024 * 1024 * 1024)
+                    {
+                        typeOfSize = "GB";
+                        sizeElement = Math.Round((double)(sizeElement / 1024 / 1024 / 1024), 2);
+                    }
+                    else if (sizeElement >= 1024 * 1024)
+                    {
+                        typeOfSize = "MB";
+                        sizeElement = Math.Round((double)(sizeElement / 1024 / 1024), 2);
+                    }
+                    else
+                    {
+                        typeOfSize = "KB";
+                        sizeElement = Math.Round((double)(sizeElement / 1024), 2);
+                    }
+
+                    string name = item.Substring(++lastIndex);
+                    
                     files.Add(new FileModel
                     {
                         Name = name,
                         PathName = item,
-                        SizeElement = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
+                        SizeElement = sizeElement,
+                        TypeOfSize = typeOfSize,
+                        SizeElementToKb = Math.Round((double)(sizeElementToKb / 1024), 2),
                         Image = "/images/file.jpg",
                         NoAccessToFile = false
                     });
