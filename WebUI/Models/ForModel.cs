@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace WebUI.Models
 {
-    public abstract class ForModel
+    public abstract class ForModel // абстактый класс для моделей
     {
-        // имя (для киента)
+        // имя (для клиента)
         public string Name { get; set; }
 
         // имя дирректории

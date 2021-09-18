@@ -3,6 +3,12 @@
     ViewData["Title"] = "Локальные диски";
 }
 
+<style>
+    #div_1:hover {
+        background: lightblue;
+    }
+</style>
+
 <br />
 <br />
 <h4>Локальные диски(@Model.Count()):</h4>
@@ -10,17 +16,20 @@
 
 @foreach (var item in Model)
 {
-    <div>
-        <a asp-action="Path" asp-route-path="@item.PathName" style="color:black">
-            <div class="float-left">
-                <image width="60" src="@item.Image"></image>
-            </div>
-            <div>
-                <b>Локальный диск(@item.Name)</b>
-                <br />
-                <b>@item.FreeSpace ГБ свободно из @item.SizeElement ГБ</b>
-            </div>
+    <div id="div_1">
+        <a asp-action="Path" asp-route-path="@item.PathName" style="color:black; text-decoration:none">
+            <table>
+                <tr>
+                    <td><image width="60" src="@item.Image"></image></td>
+                    <td>
+                        <div>
+                            <b>Локальный диск(@item.Name)</b>
+                            <br />
+                            <b>@item.FreeSpace ГБ свободно из @item.SizeElement ГБ</b>
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </a>
     </div>
-    <br />
 }
