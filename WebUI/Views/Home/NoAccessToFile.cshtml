@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Доступ закрыт";
+}
+
+@section Header
+{
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark font-weight-bold" asp-action="GetPcDisks">Мой компьютер</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark font-weight-bold" href="javascript:history.back()">Назад</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+}
+
+<br />
+<br />
+<h4 style="color:darkorange">Доступ к каталогу закрыт</h4>

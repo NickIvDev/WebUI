@@ -49,7 +49,13 @@ namespace WebUI.Controllers
         {
             GetCatalogsAhdFilesViewModel model = GetDataViewModel(path);
 
-            return View("GetCatalogsAhdFiles", model);
+            // отлавливаем каталоги без доступа
+            if (model==null)
+            {
+                return View("NoAccessToFile");
+            }
+            else
+                return View("GetCatalogsAhdFiles", model);
         }
 
         [HttpPost]
@@ -164,106 +170,113 @@ namespace WebUI.Controllers
 
         static GetCatalogsAhdFilesViewModel GetDataViewModel(string path) // получение модели представления по указанному пути
         {
-            // получаем файлы и каталоги дирректории
-            List<string> pcCatalogs = Directory.GetDirectories(path).ToList();
-            List<string> pcFiles = Directory.GetFiles(path).ToList();
-
-            // получаем экземпляры FileInfo для получения занимаегого места
-            // файлы:
-            List<FileInfo> fileInfosForFiles = new List<FileInfo>();
-            foreach (var item in pcFiles)
+            try
             {
-                fileInfosForFiles.Add(new FileInfo(item));
-            }
+                // получаем файлы и каталоги дирректории
+                List<string> pcCatalogs = Directory.GetDirectories(path).ToList();
+                List<string> pcFiles = Directory.GetFiles(path).ToList();
 
-            // инициализируем модели Catalog и File
-            List<CatalogModel> catalogs = new List<CatalogModel>();
-            List<FileModel> files = new List<FileModel>();
-
-            // каталоги
-            foreach (var item in pcCatalogs)
-            {
-                int lastIndex;
-                if (item.Contains('/'))
+                // получаем экземпляры FileInfo для получения занимаегого места
+                // файлы:
+                List<FileInfo> fileInfosForFiles = new List<FileInfo>();
+                foreach (var item in pcFiles)
                 {
-                    lastIndex = item.LastIndexOf('/');
+                    fileInfosForFiles.Add(new FileInfo(item));
                 }
-                else
-                    lastIndex = item.LastIndexOf('\\');
 
-                string name = item.Substring(++lastIndex);
-                catalogs.Add(new CatalogModel
+                // инициализируем модели Catalog и File
+                List<CatalogModel> catalogs = new List<CatalogModel>();
+                List<FileModel> files = new List<FileModel>();
+
+                // каталоги
+                foreach (var item in pcCatalogs)
                 {
-                    Name = name,
-                    PathName = item,
-                    Image = "/images/folder.jpg",
-                    NoAccessToFile = false
-                });
-            }
-
-            // рекурсия - получение размера каталогов
-            foreach (var item in catalogs)
-            {
-                double sizeCatalog = 0;
-                sizeCatalog = SizeCatalog(item.PathName, ref sizeCatalog);
-
-                // для более точного отслеживания нуля
-                double testSizeCatalog = sizeCatalog;
-
-                sizeCatalog = Math.Round((double)(sizeCatalog / 1024 / 1024 / 1024), 2);
-
-                // отлавливаем каталоги без доступа(или с файлами без доступа)
-                if (testSizeCatalog == 0)
-                {
-                    try
+                    int lastIndex;
+                    if (item.Contains('/'))
                     {
-                        List<string> c = Directory.GetDirectories(item.PathName).ToList();
-                        List<string> f = Directory.GetFiles(item.PathName).ToList();
-                        if (c.Count() != 0 || f.Count() != 0)
+                        lastIndex = item.LastIndexOf('/');
+                    }
+                    else
+                        lastIndex = item.LastIndexOf('\\');
+
+                    string name = item.Substring(++lastIndex);
+                    catalogs.Add(new CatalogModel
+                    {
+                        Name = name,
+                        PathName = item,
+                        Image = "/images/folder.jpg",
+                        NoAccessToFile = false
+                    });
+                }
+
+                // рекурсия - получение размера каталогов
+                foreach (var item in catalogs)
+                {
+                    double sizeCatalog = 0;
+                    sizeCatalog = SizeCatalog(item.PathName, ref sizeCatalog);
+
+                    // для более точного отслеживания нуля
+                    double testSizeCatalog = sizeCatalog;
+
+                    sizeCatalog = Math.Round((double)(sizeCatalog / 1024 / 1024 / 1024), 2);
+
+                    // отлавливаем каталоги без доступа(или с файлами без доступа)
+                    if (testSizeCatalog == 0)
+                    {
+                        try
+                        {
+                            List<string> c = Directory.GetDirectories(item.PathName).ToList();
+                            List<string> f = Directory.GetFiles(item.PathName).ToList();
+                            if (c.Count() != 0 || f.Count() != 0)
+                            {
+                                item.NoAccessToFile = true;
+                            }
+                        }
+                        catch (Exception ex)
                         {
                             item.NoAccessToFile = true;
                         }
                     }
-                    catch (Exception ex)
+                    item.SizeElement = sizeCatalog;
+                }
+
+                // файлы
+                foreach (var item in pcFiles)
+                {
+                    int lastIndex;
+                    if (item.Contains('/'))
                     {
-                        item.NoAccessToFile = true;
+                        lastIndex = item.LastIndexOf('/');
                     }
+                    else
+                        lastIndex = item.LastIndexOf('\\');
+
+                    string name = item.Substring(++lastIndex);
+                    FileInfo toBusySpace = fileInfosForFiles.FirstOrDefault(f => f.FullName == item);
+                    files.Add(new FileModel
+                    {
+                        Name = name,
+                        PathName = item,
+                        SizeElement = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
+                        Image = "/images/file.jpg",
+                        NoAccessToFile = false
+                    });
                 }
-                item.SizeElement = sizeCatalog;
-            }
 
-            // файлы
-            foreach (var item in pcFiles)
-            {
-                int lastIndex;
-                if (item.Contains('/'))
+                // инициализируем модель представления
+                GetCatalogsAhdFilesViewModel model = new GetCatalogsAhdFilesViewModel
                 {
-                    lastIndex = item.LastIndexOf('/');
-                }
-                else
-                    lastIndex = item.LastIndexOf('\\');
+                    Path = path,
+                    Catalogs = catalogs,
+                    Files = files
+                };
 
-                string name = item.Substring(++lastIndex);
-                FileInfo toBusySpace = fileInfosForFiles.FirstOrDefault(f => f.FullName == item);
-                files.Add(new FileModel
-                {
-                    Name = name,
-                    PathName = item,
-                    SizeElement = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
-                    Image = "/images/file.jpg",
-                    NoAccessToFile = false
-                });
+                return model;
             }
-
-            // инициализируем модель представления
-            GetCatalogsAhdFilesViewModel model = new GetCatalogsAhdFilesViewModel
+            catch (UnauthorizedAccessException ex)
             {
-                Path = path,
-                Catalogs = catalogs,
-                Files = files
-            };
-
-            return model;
+                return null;
+            }            
         }
        
         static double SizeCatalog(string path, ref double sizeCatalog) // метод рекурсивного получения размера папок
