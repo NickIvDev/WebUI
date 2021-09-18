@@ -9,7 +9,7 @@ namespace WebUI.ViewModels
     public class PathViewModel
     {
         public string Path { get; set; }
-        public List<Catalog> Catalogs { get; set; }
-        public List<_File> Files { get; set; }
+        public List<CatalogModel> Catalogs { get; set; }
+        public List<FileModel> Files { get; set; }
     }
 }

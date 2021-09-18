@@ -38,7 +38,7 @@ namespace WebUI
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=GetPcDisk}/{id?}");
+                    pattern: "{controller=Home}/{action=GetPcDisks}/{id?}");
             });
         }
     }

@@ -13,13 +13,13 @@ namespace WebUI.Controllers
 {
     public class HomeController : Controller
     {        
-        public IActionResult GetPcDisk()
+        public IActionResult GetPcDisks()
         {
             // получаем диски с ПК
             List<DriveInfo> pcDisks = DriveInfo.GetDrives().ToList();
 
             // инициализируем модели Disk
-            List<Disk> disks = new List<Disk>();
+            List<DiskModel> disks = new List<DiskModel>();
             foreach (var item in pcDisks)
             {
                 // присваеваем нужную ссылку на изображение
@@ -31,11 +31,11 @@ namespace WebUI.Controllers
                 else
                     image = "/images/localDick.jpg";
 
-                disks.Add(new Disk
+                disks.Add(new DiskModel
                 {
                     Name = item.Name.Trim('\\'),
-                    NamePath = item.Name,
-                    Space = Math.Round((double)item.TotalSize / 1024 / 1024 / 1024, 2),
+                    PathName = item.Name,
+                    SizeElement = Math.Round((double)item.TotalSize / 1024 / 1024 / 1024, 2),
                     FreeSpace = Math.Round((double)item.TotalFreeSpace / 1024 / 1024 / 1024, 2),
                     Image = image
 
@@ -60,8 +60,8 @@ namespace WebUI.Controllers
             }
 
             // инициализируем модели Catalog и File
-            List<Catalog> catalogs = new List<Catalog>();
-            List<_File> files = new List<_File>();
+            List<CatalogModel> catalogs = new List<CatalogModel>();
+            List<FileModel> files = new List<FileModel>();
 
             // каталоги
             foreach (var item in pcCatalogs)
@@ -75,7 +75,7 @@ namespace WebUI.Controllers
                     lastIndex = item.LastIndexOf('\\');
 
                 string name = item.Substring(++lastIndex);
-                catalogs.Add(new Catalog
+                catalogs.Add(new CatalogModel
                 {
                     Name = name,
                     PathName = item,
@@ -112,7 +112,7 @@ namespace WebUI.Controllers
                         item.NoAccessToFile = true;
                     }   
                 }
-                item.BusySpace = sizeCatalog;
+                item.SizeElement = sizeCatalog;
             }
 
             // файлы
@@ -128,11 +128,11 @@ namespace WebUI.Controllers
 
                 string name = item.Substring(++lastIndex);
                 FileInfo toBusySpace = fileInfosForFiles.FirstOrDefault(f => f.FullName == item);
-                files.Add(new _File
+                files.Add(new FileModel
                 {
                     Name = name,
                     PathName = item,
-                    BusySpace = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
+                    SizeElement = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
                     Image = "/images/file.jpg",
                     NoAccessToFile = false
                 });
@@ -165,8 +165,8 @@ namespace WebUI.Controllers
             }
 
             // инициализируем модели Catalog и File
-            List<Catalog> catalogs = new List<Catalog>();
-            List<_File> files = new List<_File>();
+            List<CatalogModel> catalogs = new List<CatalogModel>();
+            List<FileModel> files = new List<FileModel>();
 
             // каталоги
             foreach (var item in pcCatalogs)
@@ -180,7 +180,7 @@ namespace WebUI.Controllers
                     lastIndex = item.LastIndexOf('\\');
 
                 string name = item.Substring(++lastIndex);
-                catalogs.Add(new Catalog
+                catalogs.Add(new CatalogModel
                 {
                     Name = name,
                     PathName = item,
@@ -217,7 +217,7 @@ namespace WebUI.Controllers
                         item.NoAccessToFile = true;
                     }
                 }
-                item.BusySpace = sizeCatalog;
+                item.SizeElement = sizeCatalog;
             }
 
             // файлы
@@ -233,11 +233,11 @@ namespace WebUI.Controllers
 
                 string name = item.Substring(++lastIndex);
                 FileInfo toBusySpace = fileInfosForFiles.FirstOrDefault(f => f.FullName == item);
-                files.Add(new _File
+                files.Add(new FileModel
                 {
                     Name = name,
                     PathName = item,
-                    BusySpace = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
+                    SizeElement = Math.Round((double)toBusySpace.Length / 1024 / 1024, 2),
                     Image = "/images/file.jpg",
                     NoAccessToFile = false
                 });
@@ -251,7 +251,7 @@ namespace WebUI.Controllers
                 switch (filter)
                 {
                     case "ascending":
-                        List<Catalog> c = new List<Catalog>();                        
+                        List<CatalogModel> c = new List<CatalogModel>();                        
                         foreach (var item in catalogs)
                         {
                             if (item.NoAccessToFile==false)
@@ -259,7 +259,7 @@ namespace WebUI.Controllers
                                 c.Add(item);
                             }
                         }
-                        List<_File> f = new List<_File>();
+                        List<FileModel> f = new List<FileModel>();
                         foreach (var item in files)
                         {
                             if (item.NoAccessToFile == false)
@@ -270,13 +270,13 @@ namespace WebUI.Controllers
                         PathViewModel m = new PathViewModel
                         {
                             Path = path,
-                            Catalogs = c.OrderBy(c=>c.BusySpace).ToList(),
-                            Files = f.OrderBy(f => f.BusySpace).ToList(),
+                            Catalogs = c.OrderBy(c=>c.SizeElement).ToList(),
+                            Files = f.OrderBy(f => f.SizeElement).ToList(),
                         };
                         return View(m);
 
                     case "descending":
-                        List<Catalog> c1 = new List<Catalog>();
+                        List<CatalogModel> c1 = new List<CatalogModel>();
                         foreach (var item in catalogs)
                         {
                             if (item.NoAccessToFile == false)
@@ -284,7 +284,7 @@ namespace WebUI.Controllers
                                 c1.Add(item);
                             }
                         }
-                        List<_File> f1 = new List<_File>();
+                        List<FileModel> f1 = new List<FileModel>();
                         foreach (var item in files)
                         {
                             if (item.NoAccessToFile == false)
@@ -295,13 +295,13 @@ namespace WebUI.Controllers
                         PathViewModel m1 = new PathViewModel
                         {
                             Path = path,
-                            Catalogs = c1.OrderByDescending(c => c.BusySpace).ToList(),
-                            Files = f1.OrderByDescending(f => f.BusySpace).ToList(),
+                            Catalogs = c1.OrderByDescending(c => c.SizeElement).ToList(),
+                            Files = f1.OrderByDescending(f => f.SizeElement).ToList(),
                         };
                         return View(m1);
 
                     case "noAccessToFile":
-                        List<Catalog> c2 = new List<Catalog>();
+                        List<CatalogModel> c2 = new List<CatalogModel>();
                         foreach (var item in catalogs)
                         {
                             if (item.NoAccessToFile == true)
@@ -309,7 +309,7 @@ namespace WebUI.Controllers
                                 c2.Add(item);
                             }
                         }
-                        List<_File> f2 = new List<_File>();
+                        List<FileModel> f2 = new List<FileModel>();
                         foreach (var item in files)
                         {
                             if (item.NoAccessToFile == true)

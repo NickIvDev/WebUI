@@ -1,4 +1,4 @@
-﻿@model List<Disk>
+﻿@model List<DiskModel>
 @{
     ViewData["Title"] = "Локальные диски";
 }
@@ -11,14 +11,14 @@
 @foreach (var item in Model)
 {
     <div>
-        <a asp-action="Path" asp-route-path="@item.NamePath" style="color:black">
+        <a asp-action="Path" asp-route-path="@item.PathName" style="color:black">
             <div class="float-left">
                 <image width="60" src="@item.Image"></image>
             </div>
             <div>
                 <b>Локальный диск(@item.Name)</b>
                 <br />
-                <b>@item.FreeSpace ГБ свободно из @item.Space ГБ</b>
+                <b>@item.FreeSpace ГБ свободно из @item.SizeElement ГБ</b>
             </div>
         </a>
     </div>
