@@ -26,6 +26,6 @@ namespace WebUI.Models
         public string Image { get; set; }       
 
         // доступ к файлу закрыт
-        public bool NoAccessToFile { get; set; }
+        public bool NoAccessToFile { get; set; }        
     }
 }

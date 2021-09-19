@@ -81,13 +81,13 @@ namespace WebUI.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetFilterDataBySize(string path, string filterBySize) // фильтрация переданного каталога по размеру
+        public IActionResult GetSortDataBySize(string path, string sortBySize) // сортировка переданного каталога по размеру
         {
             GetCatalogsAhdFilesViewModel tempModel = GetDataViewModel(path);
 
-            if (filterBySize != null)
+            if (sortBySize != null)
             {
-                switch (filterBySize)
+                switch (sortBySize)
                 {
                     case "ascending":
                         List<CatalogModel> c = new List<CatalogModel>();
@@ -216,7 +216,7 @@ namespace WebUI.Controllers
                     sizeCatalog = SizeCatalog(item.PathName, ref sizeCatalog);
 
                     // для более точного отслеживания нуля
-                    double testSizeCatalog = sizeCatalog;                    
+                    double testSizeCatalog = sizeCatalog;
 
                     // отлавливаем каталоги без доступа(или с файлами без доступа)
                     if (testSizeCatalog == 0)
@@ -288,7 +288,7 @@ namespace WebUI.Controllers
                     }
 
                     string name = item.Substring(++lastIndex);
-                    
+
                     files.Add(new FileModel
                     {
                         Name = name,
@@ -316,9 +316,9 @@ namespace WebUI.Controllers
                 return null;
             }            
         }
-       
-        static double SizeCatalog(string path, ref double sizeCatalog) // метод рекурсивного получения размера папок
-        {        
+
+        public static double SizeCatalog(string path, ref double sizeCatalog) // метод рекурсивного получения размера папок
+        {
             try
             {
                 DirectoryInfo di = new DirectoryInfo(path);
@@ -342,5 +342,31 @@ namespace WebUI.Controllers
                 return 0;
             }
         }
+
+        //public static double SizeCatalog2(string path) // метод рекурсивного получения размера папок
+        //{
+        //    try
+        //    {
+        //        double sizeCatalog = 0;
+        //        DirectoryInfo di = new DirectoryInfo(path);
+        //        FileInfo[] fiA = di.GetFiles();
+        //        foreach (FileInfo fi in fiA)
+        //        {
+        //            sizeCatalog += fi.Length;
+        //        }
+
+        //        DirectoryInfo[] diA = di.GetDirectories();
+        //        foreach (DirectoryInfo d in diA)
+        //        {
+        //            sizeCatalog += SizeCatalog2(d.FullName);
+        //        }
+
+        //        return sizeCatalog;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return 0;
+        //    }
+        //}
     }
 }
