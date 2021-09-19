@@ -14,7 +14,7 @@ namespace WebUI.Models
         {            
             // рекурсия - получение размера каталогов           
             double sizeCatalog = 0;
-            //sizeCatalog = HomeController.SizeCatalog(catalog.PathName, ref sizeCatalog);
+            //sizeCatalog = HomeController.SizeCatalog2(catalog.PathName);
             sizeCatalog = HomeController.SizeCatalog(catalog.PathName, ref sizeCatalog);
             
             // для более точного отслеживания нуля

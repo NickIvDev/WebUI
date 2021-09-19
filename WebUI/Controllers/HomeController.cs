@@ -10,7 +10,7 @@ using WebUI.Models;
 using WebUI.ViewModels;
 
 namespace WebUI.Controllers
-{
+{   
     public class HomeController : Controller
     {        
         [HttpGet]
@@ -343,7 +343,53 @@ namespace WebUI.Controllers
             }
         }
 
-        //public static double SizeCatalog2(string path) // метод рекурсивного получения размера папок
+        //public CatalogModel GetSizeCatalogForView(CatalogModel catalog) // for View
+        //{
+        //    double sizeCatalog = SizeCatalog2(catalog.PathName);
+
+        //    // для более точного отслеживания нуля
+        //    double testSizeCatalog = sizeCatalog;
+
+        //    // отлавливаем каталоги без доступа(или с файлами без доступа)
+        //    if (testSizeCatalog == 0)
+        //    {
+        //        try
+        //        {
+        //            List<string> c = Directory.GetDirectories(catalog.PathName).ToList();
+        //            List<string> f = Directory.GetFiles(catalog.PathName).ToList();
+        //            if (c.Count() != 0 || f.Count() != 0)
+        //            {
+        //                catalog.NoAccessToFile = true;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            catalog.NoAccessToFile = true;
+        //        }
+        //    }
+
+        //    if (testSizeCatalog >= 1024 * 1024 * 1024)
+        //    {
+        //        catalog.TypeOfSize = "GB";
+        //        catalog.SizeElement = Math.Round((double)(sizeCatalog / 1024 / 1024 / 1024), 2);
+        //        catalog.SizeElementToKb = Math.Round((double)(sizeCatalog / 1024), 2);
+        //    }
+        //    else if (testSizeCatalog >= 1024 * 1024)
+        //    {
+        //        catalog.TypeOfSize = "MB";
+        //        catalog.SizeElement = Math.Round((double)(sizeCatalog / 1024 / 1024), 2);
+        //        catalog.SizeElementToKb = Math.Round((double)(sizeCatalog / 1024), 2);
+        //    }
+        //    else
+        //    {
+        //        catalog.TypeOfSize = "KB";
+        //        catalog.SizeElement = Math.Round((double)(sizeCatalog / 1024), 2);
+        //        catalog.SizeElementToKb = Math.Round((double)(sizeCatalog / 1024), 2);
+        //    }
+        //    return catalog;
+        //}
+
+        //public static double SizeCatalog2(string path) // метод рекурсивного получения размера папок for View
         //{
         //    try
         //    {

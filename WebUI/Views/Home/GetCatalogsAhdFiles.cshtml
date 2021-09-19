@@ -1,4 +1,5 @@
 ﻿@model WebUI.ViewModels.GetCatalogsAhdFilesViewModel
+@using System.Web
 @{
     ViewData["Title"] = "Каталог";
 }
@@ -8,8 +9,6 @@
         background: lightblue;
     }
 </style>
-
-<script src="jquery-1.10.1.min.js"></script>
 
 @section Header
 {
@@ -82,57 +81,7 @@
                 </td>
                 @item.GetSizeElement(item)
                 @if (item.NoAccessToFile == false)
-                    {
-                        @if (item.TypeOfSize == "GB")
-                        {
-                            <td>
-                                <b>&emsp;@item.SizeElement ГБ</b>
-                            </td>
-                        }
-                        else if (item.TypeOfSize == "MB")
-                        {
-                            <td>
-                                <b style="color:dimgrey">&emsp;@item.SizeElement МБ</b>
-                            </td>
-                        }
-                        else if (item.TypeOfSize == "KB")
-                        {
-                            <td>
-                                <b style="color:lightgrey">&emsp;@item.SizeElement КБ</b>
-                            </td>
-                        }
-
-                    }
-                    else
-                    {
-                        <td>
-                            <b style="color:darkorange">&emsp;Нет доступа к файлу</b>
-                        </td>
-                    }
-                @*<td>
-                    <b onload="myfunction" id="@item.PathName" style="color:forestgreen">
-                        Расчет занимаегого места
-                    </b>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            var b = document.getElementById("@item.PathName");
-                            b.innerText = "HIIIIII";                            
-                        }, false);                        
-                    </script>
-                </td>*@
-            </tr>
-        }
-    }
-
-    @if (Model.Files.Count() != 0)
-        {
-            @foreach (var item in Model.Files)
-            {
-                <tr>
-                    <td>
-                        <image width="60" src="@item.Image"></image>
-                        <b>@item.Name</b>
-                    </td>
+                {
                     @if (item.TypeOfSize == "GB")
                     {
                         <td>
@@ -151,14 +100,88 @@
                             <b style="color:lightgrey">&emsp;@item.SizeElement КБ</b>
                         </td>
                     }
-                </tr>
-            }
+
+                }
+                else
+                {
+                    <td>
+                        <b style="color:darkorange">&emsp;Нет доступа к файлу</b>
+                    </td>
+                }
+                @*<td>
+                        <b id="@item.PathName" style="color:forestgreen">
+                            Расчет занимаегого места
+                        </b>
+                        
+                        <script>
+                            $(document).ready(function () {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/Home/GetSizeCatalogForView',
+                                    success: function (result) {
+                                        alert();
+                                    }
+                                });
+                            });
+                                
+                            
+                            
+
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('GET', @item.GetSizeElement(item);
+                            xhr.onreadystatechange = function () {
+                                if (xhr.readyState!==4 || xhr.status!==200) {
+                                    return;
+                                }
+                                var b = document.getElementById("@item.PathName");
+                                b.innerText = "@item.SizeElement";
+                            }
+                            xhr.send();
+                        </script>
+                </td>*@
+            </tr>
         }
-   
+    }
+
+    @if (Model.Files.Count() != 0)
+    {
+        @foreach (var item in Model.Files)
+        {
+            <tr>
+                <td>
+                    <image width="60" src="@item.Image"></image>
+                    <b>@item.Name</b>
+                </td>
+                @if (item.TypeOfSize == "GB")
+                {
+                    <td>
+                        <b>&emsp;@item.SizeElement ГБ</b>
+                    </td>
+                }
+                else if (item.TypeOfSize == "MB")
+                {
+                    <td>
+                        <b style="color:dimgrey">&emsp;@item.SizeElement МБ</b>
+                    </td>
+                }
+                else if (item.TypeOfSize == "KB")
+                {
+                    <td>
+                        <b style="color:lightgrey">&emsp;@item.SizeElement КБ</b>
+                    </td>
+                }
+            </tr>
+        }
+    }
+
 </table>
 
-<script>
-    function myfunction(e) {
-        
-    }
-</script>
+@*<script>
+    function getFullItem(path) {
+        $.get("/Home/GetSizeCatalogForView", { id: id })
+            .done(function (data) {
+                
+                
+            });
+    }  
+</script>*@
