@@ -10,6 +10,11 @@
     }
 </style>
 
+@*Подключаем JQuery*@
+<script src="https://code.jquery.com/jquery-2.2.4.js"
+        integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
+        crossorigin="anonymous"></script>
+
 @section Header
 {
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -17,10 +22,10 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark font-weight-bold" asp-action="GetPcDisks">Мой компьютер</a>
+                        <a style="cursor:pointer" class="nav-link text-dark font-weight-bold" asp-action="GetPcDisks">Мой компьютер</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark font-weight-bold" href="javascript:history.back()">Назад</a>
+                        <a style="cursor:pointer" class="nav-link text-dark font-weight-bold" onclick="history.back()">Назад</a>
                     </li>
                 </ul>
             </div>
@@ -33,55 +38,192 @@
 <h4>Фалы директории: @Model.Files.Count()</h4>
 <br />
 
-<table id="table">
-    <tr>
-        <td>
-            <div class="form-inline">
-                <form method="post" asp-action="GetFilterDataByName" asp-route-path="@Model.Path">
-                    <b>Имя:</b>
-                    <input name="elementName" />
-                    <input type="submit" value="Поиск" />
-                    &ensp;
-                </form>
-                <form method="post" asp-action="GetFilterDataByName" asp-route-path="@Model.Path">
-                    <input type="submit" value="Показать всех" />
-                </form>
-            </div>
-        </td>
-        <td>
-            <form method="post">
+@*Используемые функции*@
+<script>
+    var checkCount = 0;
+    function changeDivVisibility()
+    {
+        checkCount++;
+        if (checkCount == @Model.Catalogs.Count()) {
+            let tempDiv = document.getElementById("tempDiv");
+            tempDiv.style.display = "none";
+            let sizeDiv = document.getElementById("sizeDiv");
+            sizeDiv.style.display = "inline";
+        }
+    }
+
+    function SortSizeByAscending() {
+        const table = document.getElementById('sortTable'); // запрашиваем таблицу
+        const tableBody = table.querySelector('tbody');     // тело таблицы
+        const rows = tableBody.querySelectorAll('tr');      // строки тела таблицы
+        const newRows = Array.from(rows);                   // клонируем строки
+
+        //сортируем строки по вспомогательному столбцу
+        newRows.sort(function (rowA, rowB) {
+            const cellA = parseInt(rowA.lastElementChild.innerHTML, 10);
+            const cellB = parseInt(rowB.lastElementChild.innerHTML, 10);
+
+            switch (true) {
+                case cellA > cellB: return 1;
+                case cellA < cellB: return -1;
+                case cellA === cellB: return 0;
+            }
+        });
+
+        // удаляем старые строки
+        [].forEach.call(rows, function (row) {
+            tableBody.removeChild(row);
+        });
+
+        // добавляем новые строки
+        newRows.forEach(function (newRow) {
+            tableBody.appendChild(newRow);
+        });
+    }
+
+    function SortSizeByDescending() {
+        const table = document.getElementById('sortTable'); // запрашиваем таблицу
+        const tableBody = table.querySelector('tbody');     // тело таблицы
+        const rows = tableBody.querySelectorAll('tr');      // строки тела таблицы
+        const newRows = Array.from(rows);                   // клонируем строки
+
+        //сортируем строки по вспомогательному столбцу
+        newRows.sort(function (rowA, rowB) {
+            const cellA = parseInt(rowA.lastElementChild.innerHTML, 10);
+            const cellB = parseInt(rowB.lastElementChild.innerHTML, 10);
+
+            switch (true) {
+                case cellA > cellB: return -1;
+                case cellA < cellB: return 1;
+                case cellA === cellB: return 0;
+            }
+        });
+
+        // удаляем старые строки
+        [].forEach.call(rows, function (row) {
+            tableBody.removeChild(row);
+        });
+
+        // добавляем новые строки
+        newRows.forEach(function (newRow) {
+            tableBody.appendChild(newRow);
+        });
+    }
+</script>
+
+@*Основная таблица с данными*@
+<table id="sortTable">
+    <thead>
+        <tr>
+            <td>
                 <div class="form-inline">
+                    <form method="post" asp-action="GetFilterDataByName" asp-route-path="@Model.Path">
+                        <b>Имя:</b>
+                        <input name="elementName" />
+                        <input type="submit" value="Поиск" />
+                        &ensp;
+                    </form>
+                    <form method="post" asp-action="GetFilterDataByName" asp-route-path="@Model.Path">
+                        <input type="submit" value="Показать всех" />
+                    </form>
+                </div>
+            </td>
+            <td>
+                <div class="form-inline" id="tempDiv">
+                    &emsp;
+                    <b style="color:darkorange">Размер: Подготовка данных</b>
+                </div>
+                <div class="form-inline" id="sizeDiv" style="display: none">
                     &emsp;
                     <b>Размер:</b>
                     &ensp;
-                    <input asp-action="GetSortDataBySize" asp-route-path="@Model.Path" asp-route-sortBySize="ascending" type="submit" value="По возрастанию" />
+                    <input onclick="SortSizeByAscending()" type="submit" value="По возрастанию" />
                     &ensp;
-                    <input asp-action="GetSortDataBySize" asp-route-path="@Model.Path" asp-route-sortBySize="descending" type="submit" value="По убыванию" />
-                    &ensp;
-                    <input asp-action="GetSortDataBySize" asp-route-path="@Model.Path" asp-route-sortBySize="noAccessToFile" type="submit" value="Файл без доступа" />
+                    <input onclick="SortSizeByDescending()" type="submit" value="По убыванию" />
                 </div>
-            </form>
-        </td>
-    </tr>
+            </td>
+            <td></td>
+        </tr>
+    </thead>
 
-    @if (Model.Catalogs.Count() != 0)
-    {
-        @foreach (var item in Model.Catalogs)
+    <tbody>
+        @if (Model.Catalogs.Count() != 0)
         {
-            <tr>
-                <td>
-                    <div id="div_1">
-                        <a style="color:black; text-decoration:none" asp-action="TransitionToCatalog" asp-route-path="@item.PathName">
-                            <div>
-                                <image width="60" src="@item.Image"></image>
-                                <b>@item.Name</b>
-                            </div>
-                        </a>
-                    </div>
-                </td>
-                @item.GetSizeElement(item)
-                @if (item.NoAccessToFile == false)
-                {
+            @foreach (var item in Model.Catalogs)
+            {
+                <tr>
+                    <td>
+                        <div id="div_1">
+                            <a style="color:black; text-decoration:none" asp-action="TransitionToCatalog" asp-route-path="@item.PathName">
+                                <div>
+                                    <image width="60" src="@item.Image"></image>
+                                    <b>@Html.Raw(HttpUtility.HtmlDecode(item.Name))</b>
+                                </div>
+                            </a>
+                        </div>
+                    </td>
+
+                    <td>
+                        <script>
+                        $.ajax("GetSizeCatalogForView?" + $.param({path: String.raw`@Html.Raw(HttpUtility.HtmlDecode(item.PathName))`}),
+                            {
+                                success: function (data)
+                                {
+                                    let b = document.getElementById("@Html.Raw(HttpUtility.HtmlDecode(item.Name))");
+                                    let bSortSize = document.getElementById("@Html.Raw(HttpUtility.HtmlDecode(item.Name))-itemBySort");
+                                    bSortSize.innerText = data;
+
+                                    if (data == -1)
+                                    {
+                                        b.style.color = "darkorange";
+                                        b.style.fontWeight = "normal";
+                                        b.innerHTML = `<b>&emsp;Нет доступа к файлу</b>`;
+
+                                    }
+                                    else if (data >= 1024 * 1024 * 1024)
+                                    {
+                                        data = data / 1024 / 1024 / 1024;
+                                        data = Math.floor(data * 100) / 100;
+                                        b.style.color = "black";
+                                        b.style.fontWeight = "normal";
+                                        b.innerHTML = `<b>&emsp;${data} ГБ</b>`;
+                                    }
+                                    else if (data >= 1024 * 1024)
+                                    {
+                                        data = data / 1024 / 1024;
+                                        data = Math.floor(data * 100) / 100;
+                                        b.style.color = "dimgrey";
+                                        b.style.fontWeight = "normal";
+                                        b.innerHTML = `<b>&emsp;${data} МБ</b>`;
+                                    }
+                                    else
+                                    {
+                                        data = data / 1024;
+                                        data = Math.floor(data * 100) / 100;
+                                        b.style.color = "lightgrey";
+                                        b.style.fontWeight = "normal";
+                                        b.innerHTML = `<b>&emsp;${data} КБ</b>`;
+                                    }
+                                    changeDivVisibility();
+                                }
+                        });
+                        </script>
+                        <b id="@Html.Raw(HttpUtility.HtmlDecode(item.Name))" style="color:darkorange">&emsp;Расчет занимаегого места</b>
+                    </td>
+                    <td id="@Html.Raw(HttpUtility.HtmlDecode(item.Name))-itemBySort" style="visibility:hidden"></td>
+                </tr>
+            }
+        }
+
+        @if (Model.Files.Count() != 0)
+        {
+            @foreach (var item in Model.Files)
+            {
+                <tr>
+                    <td>
+                        <image width="60" src="@item.Image"></image>
+                        <b>@item.Name</b>
+                    </td>
                     @if (item.TypeOfSize == "GB")
                     {
                         <td>
@@ -100,88 +242,23 @@
                             <b style="color:lightgrey">&emsp;@item.SizeElement КБ</b>
                         </td>
                     }
-
-                }
-                else
-                {
-                    <td>
-                        <b style="color:darkorange">&emsp;Нет доступа к файлу</b>
-                    </td>
-                }
-                @*<td>
-                        <b id="@item.PathName" style="color:forestgreen">
-                            Расчет занимаегого места
-                        </b>
-                        
-                        <script>
-                            $(document).ready(function () {
-                                $.ajax({
-                                    type: 'GET',
-                                    url: '/Home/GetSizeCatalogForView',
-                                    success: function (result) {
-                                        alert();
-                                    }
-                                });
-                            });
-                                
-                            
-                            
-
-                            const xhr = new XMLHttpRequest();
-                            xhr.open('GET', @item.GetSizeElement(item);
-                            xhr.onreadystatechange = function () {
-                                if (xhr.readyState!==4 || xhr.status!==200) {
-                                    return;
-                                }
-                                var b = document.getElementById("@item.PathName");
-                                b.innerText = "@item.SizeElement";
-                            }
-                            xhr.send();
-                        </script>
-                </td>*@
-            </tr>
+                    <td id="itemBySort" style="visibility:hidden">@(item.SizeElementToKb*1024)</td>
+                </tr>
+            }
         }
-    }
-
-    @if (Model.Files.Count() != 0)
-    {
-        @foreach (var item in Model.Files)
-        {
-            <tr>
-                <td>
-                    <image width="60" src="@item.Image"></image>
-                    <b>@item.Name</b>
-                </td>
-                @if (item.TypeOfSize == "GB")
-                {
-                    <td>
-                        <b>&emsp;@item.SizeElement ГБ</b>
-                    </td>
-                }
-                else if (item.TypeOfSize == "MB")
-                {
-                    <td>
-                        <b style="color:dimgrey">&emsp;@item.SizeElement МБ</b>
-                    </td>
-                }
-                else if (item.TypeOfSize == "KB")
-                {
-                    <td>
-                        <b style="color:lightgrey">&emsp;@item.SizeElement КБ</b>
-                    </td>
-                }
-            </tr>
-        }
-    }
-
+    </tbody>
 </table>
 
-@*<script>
-    function getFullItem(path) {
-        $.get("/Home/GetSizeCatalogForView", { id: id })
-            .done(function (data) {
-                
-                
-            });
-    }  
-</script>*@
+@*Правка багов*@
+<script>
+    var tempDiv = document.getElementById("tempDiv");
+    var sizeDiv = document.getElementById("sizeDiv");
+
+    if (@Model.Catalogs.Count() === 0 && @Model.Files.Count() === 0) {
+        tempDiv.style.display = "none";
+    }
+    else if (@Model.Catalogs.Count() === 0 && @Model.Files.Count() > 0) {
+        tempDiv.style.display = "none";
+        sizeDiv.style.display = "inline";
+    }
+</script>
