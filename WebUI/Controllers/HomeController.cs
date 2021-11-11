@@ -223,10 +223,6 @@ namespace WebUI.Controllers
                 {
                     List<string> c = Directory.GetDirectories(path).ToList();
                     List<string> f = Directory.GetFiles(path).ToList();
-                    if (c.Count() != 0 || f.Count() != 0)
-                    {
-                        testSizeCatalog = -1;
-                    }
                 }
                 catch (Exception ex)
                 {
